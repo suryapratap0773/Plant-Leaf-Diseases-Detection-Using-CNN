@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Classifier</title>
+    <style>
+        body {
+            background-image: url("/static/BG.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-color: #539f56;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+        }        
+
+        nav {
+            background-color: #539f56;
+            color: white;
+            padding: 1rem 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        nav h1 {
+            margin: 0;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .file-input-container {
+            margin-bottom: 0.8rem;
+        }
+
+        #image-preview {
+            margin-top: 0.8rem;
+            max-width: 500px;
+            max-height: 500px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.7rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn:hover {
+            background-color: #205623;
+        }
+
+        footer {
+            background-color: #539f56;
+            width: 100%;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        .result-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(14, 137, 24, 0.7);
+            color: white;
+            border-radius: 5px;
+            max-width: 200px;
+            width: 100%;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Plant Disease Detection Using CNN Image Classification</h1>
+    </nav>
+
+    <main>
+        <div class="file-input-container">
+            <label for="file-upload" class="btn">Choose an Image</label>
+            <input id="file-upload" type="file" accept="image/*" style="display: none;">
+        </div>
+
+        <img id="image-preview" alt="Image Preview">
+
+        <button id="predict-btn" class="btn" disabled>Predict</button>
+
+        <div id="result" class="result-box" style="display:none;">
+        </div>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://www.linkedin.com/in/suryapratap0773" target="_blank" style="color: white; text-decoration: none;">Surya Pratap Verma</a> |
+            <a href="https://www.linkedin.com/in/shagun-chauhan-239aa3293" target="_blank" style="color: white; text-decoration: none;">Shagun Chauhan</a>
+        </p>
+    </footer>
+    
+
+    <script>
+        const fileInput = document.getElementById('file-upload');
+        const imagePreview = document.getElementById('image-preview');
+        const predictButton = document.getElementById('predict-btn');
+        const resultDisplay = document.getElementById('result');
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    predictButton.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        predictButton.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            resultDisplay.textContent = 'Predicting...';
+            resultDisplay.style.display = 'block';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Prediction failed');
+                }
+
+                const result = await response.text();
+                const [predictedLabel, accuracy] = result.split('Accuracy:');
+
+                resultDisplay.innerHTML = `
+                    ${predictedLabel} <br> 
+                    Accuracy: ${accuracy}
+                `;
+            } catch (error) {
+                resultDisplay.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
