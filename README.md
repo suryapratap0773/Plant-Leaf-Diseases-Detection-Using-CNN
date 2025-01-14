@@ -94,5 +94,5 @@ Images were preprocessed (resized, normalized, and augmented) to enhance model p
 ---
 
 ## 🤝 Contributors
-  -Surya Pratap Verma: Model development, UI design, testing.
-  -Shagun Chauhan: Data collection, documentation, testing.
+  -**Surya Pratap Verma**: Model development, UI design, testing.
+  -**Shagun Chauhan**: Data collection, documentation, testing.
